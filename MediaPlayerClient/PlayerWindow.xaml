@@ -53,11 +53,17 @@
                         </Setter>
                     </Style>
                 </Grid.Resources>
-                <local:HackySlider x:Name="HackySpeedSlider" Maximum="4" Value="1" PreviewMouseUp="HackySpeedSlider_PreviewMouseUp" Width="200" Height="15" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <local:HackySlider x:Name="HackySpeedSlider" Maximum="4" Value="1" PreviewMouseUp="HackySpeedSlider_PreviewMouseUp" Width="150" Height="15"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button x:Name="BackButton" Content="&#xED3C;" Click="BackButton_Click"/>
                     <Button x:Name="PlayButton" Content="&#xE769;" Click="PlayButton_Click"/>
                     <Button x:Name="ForwardButton" Content="&#xED3D;" Click="ForwardButton_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <local:HackySlider x:Name="HackyVolumeSlider" Maximum="1" Value="0.5" PreviewMouseUp="HackyVolumeSlider_PreviewMouseUp" Width="150" Height="15"/>
                 </StackPanel>
             </Grid>
         </StackPanel>

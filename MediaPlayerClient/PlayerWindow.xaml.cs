@@ -5,13 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Diagnostics;
 
 namespace MediaPlayerClient
@@ -227,6 +222,14 @@ namespace MediaPlayerClient
         {
             PlaySpeed = HackySpeedSlider.Value;
             ServerConnection?.SendRequest(MediaCommand.SetPlaySpeed(PlaySpeed));
+        }
+
+        private void HackyVolumeSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (mediaElements.Count > 0)
+            {
+                mediaElements[0].Volume = HackyVolumeSlider.Value;
+            }
         }
     }
 }

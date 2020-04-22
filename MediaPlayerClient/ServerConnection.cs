@@ -32,8 +32,15 @@ namespace MediaPlayerClient
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             var cts = new CancellationToken();
             socket = new ClientWebSocket();
-            await socket.ConnectAsync(serverUri, cts);
-
+            try
+            {
+                await socket.ConnectAsync(serverUri, cts);
+            }
+            catch
+            {
+                Debug.Print("error on connection establish");
+                return;
+            }
             var ctss = new CancellationTokenSource();
 
             Task.Factory.StartNew(
@@ -43,9 +50,19 @@ namespace MediaPlayerClient
                     var rcvBuffer = new ArraySegment<byte>(rcvBytes);
                     while (true)
                     {
+                        WebSocketReceiveResult rcvResult = null;
                         try
                         {
-                            WebSocketReceiveResult rcvResult = await socket.ReceiveAsync(rcvBuffer, ctss.Token);
+                            rcvResult = await socket.ReceiveAsync(rcvBuffer, ctss.Token);
+                        }
+                        catch
+                        {
+                            Debug.Print("error on communication");
+                            socket = null;
+                            break;
+                        }
+                        try
+                        {
                             byte[] msgBytes = rcvBuffer.Skip(rcvBuffer.Offset).Take(rcvResult.Count).ToArray();
                             string rcvMsg = Encoding.UTF8.GetString(msgBytes);
                             Application.Current.Dispatcher.Invoke(new System.Action(() => { HandleMessage(rcvMsg); }));
@@ -55,7 +72,6 @@ namespace MediaPlayerClient
                         Debug.Print(e.ToString());
                         }
                     }
-                    Debug.Print("how did this end????");
                 }, ctss.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             await SendRequest(MediaCommand.Join(Room));
@@ -83,29 +99,7 @@ namespace MediaPlayerClient
         {
             var encoded = Encoding.UTF8.GetBytes(data);
             var buffer = new ArraySegment<byte>(encoded, 0, encoded.Length);
-            await socket.SendAsync(buffer, WebSocketMessageType.Text, true, new CancellationToken());
-        }
-
-        public static async Task<string> ReadString(ClientWebSocket ws)
-        {
-            ArraySegment<byte> buffer = new ArraySegment<byte>(new Byte[8192]);
-
-            WebSocketReceiveResult result = null;
-
-            using (var ms = new MemoryStream())
-            {
-                do
-                {
-                    result = await ws.ReceiveAsync(buffer, CancellationToken.None);
-                    ms.Write(buffer.Array, buffer.Offset, result.Count);
-                }
-                while (!result.EndOfMessage);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                using (var reader = new StreamReader(ms, Encoding.UTF8))
-                    return reader.ReadToEnd();
-            }
+            await socket?.SendAsync(buffer, WebSocketMessageType.Text, true, new CancellationToken());
         }
 
     }
