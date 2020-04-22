@@ -17,6 +17,7 @@ namespace MediaPlayerClient
         [JsonProperty("action")]
         [JsonConverter(typeof(StringEnumConverter))]
         public Action action;
+        public String name = "WPF";
 
         public MediaCommand(string roomId, bool? paused, double? timeStamp, double? playSpeed, Action action)
         {
@@ -30,6 +31,21 @@ namespace MediaPlayerClient
         public static MediaCommand Join(String room)
         {
             return new MediaCommand(room, null, null, null, Action.join);
+        }
+
+        public static MediaCommand Pause(bool pause)
+        {
+            return new MediaCommand(null, pause, null, null, Action.change);
+        }
+
+        public static MediaCommand SetTimeStamp(double timeStamp)
+        {
+            return new MediaCommand(null, null, timeStamp, null, Action.change);
+        }
+
+        public static MediaCommand GetUpdate()
+        {
+            return new MediaCommand(null, null, null, null, Action.getUpdate);
         }
 
         public string ToJson()

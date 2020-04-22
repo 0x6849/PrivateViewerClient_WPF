@@ -22,7 +22,30 @@ namespace MediaPlayerClient
     public partial class PlayerWindow : Window
     {
         private List<MediaElement> mediaElements = new List<MediaElement>();
-        private bool isPlaying = true;
+        bool IsPaused
+        {
+            get => mediaElements.Count > 0 ? mediaElements[0].LoadedBehavior == MediaState.Pause : true;
+            set
+            {
+                mediaElements.ForEach(element => element.LoadedBehavior = value ? MediaState.Pause : MediaState.Play);
+            }
+        }
+        double TimeStamp
+        {
+            get => mediaElements.Count > 0 ? mediaElements[0].Position.TotalSeconds : 0;
+            set
+            {
+                mediaElements.ForEach(element => element.Position = TimeSpan.FromSeconds(value));
+            }
+        }
+        double PlaySpeed
+        {
+            get => mediaElements.Count > 0 ? mediaElements[0].SpeedRatio : 0;
+            set
+            {
+                mediaElements.ForEach(element => element.SpeedRatio = value);
+            }
+        }
         private TimeSpan totalTime;
         private DispatcherTimer updateSliderTimer;
         public ServerConnection ServerConnection
@@ -35,7 +58,11 @@ namespace MediaPlayerClient
                     serverConnection.MessageReceivedEvent -= ServerConnection_MessageReceivedEvent;
                 }
                 serverConnection = value;
-                serverConnection.MessageReceivedEvent += ServerConnection_MessageReceivedEvent;
+                if (serverConnection != null)
+                {
+                    serverConnection.MessageReceivedEvent += ServerConnection_MessageReceivedEvent;
+                    serverConnection.SendRequest(MediaCommand.GetUpdate());
+                }
             }
         }
         private ServerConnection serverConnection;
@@ -100,27 +127,29 @@ namespace MediaPlayerClient
 
         private void UpdateAllVideos(MediaResult result)
         {
-            mediaElements.ForEach(element =>
+            if (result.paused != null)
             {
-                if (result.paused != null)
-                {
-                    
-                    element.LoadedBehavior = result.paused.GetValueOrDefault() ? MediaState.Pause : MediaState.Play;
-                }
-                if (result.timeStamp != null)
-                {
-                    element.Position = TimeSpan.FromSeconds(result.timeStamp.GetValueOrDefault());
-                }
-                if (result.playSpeed != null)
-                {
-                    element.SpeedRatio = result.playSpeed.GetValueOrDefault();
-                }
-            });
+                IsPaused = result.paused.GetValueOrDefault();
+            }
+            if (result.timeStamp != null)
+            {
+                TimeStamp = result.timeStamp.GetValueOrDefault();
+            }
+            if (result.playSpeed != null)
+            {
+                PlaySpeed = result.playSpeed.GetValueOrDefault();
+            }
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-
+            switch (e.Key)
+            {
+                case Key.Space:
+                    IsPaused = !IsPaused;
+                    ServerConnection?.SendRequest(MediaCommand.Pause(IsPaused));
+                    break;
+            }
         }
 
         
@@ -148,8 +177,15 @@ namespace MediaPlayerClient
           
             if (totalTime.TotalSeconds > 0)
             {
-                mediaElements.ForEach(element => element.Position = TimeSpan.FromSeconds(TimeSlider.Value));
+                TimeStamp = TimeSlider.Value;
+                ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
             }
+        }
+
+        private void VideoGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IsPaused = !IsPaused;
+            ServerConnection?.SendRequest(MediaCommand.Pause(IsPaused));
         }
     }
 }

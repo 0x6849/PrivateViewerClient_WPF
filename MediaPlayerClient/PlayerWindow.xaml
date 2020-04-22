@@ -87,7 +87,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" x:Name="VideoGrid"/>
+        <Grid Grid.Row="0" x:Name="VideoGrid" MouseDown="VideoGrid_MouseDown"/>
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <Slider x:Name="TimeSlider" Style="{StaticResource Horizontal_Slider}" IsMoveToPointEnabled="True"
                     PreviewMouseUp="TimeSlider_MouseUp"/>
