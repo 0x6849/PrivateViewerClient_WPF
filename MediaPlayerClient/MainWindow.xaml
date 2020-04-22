@@ -1,0 +1,23 @@
+﻿<Window x:Class="MediaPlayerClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MediaPlayerClient"
+        mc:Ignorable="d"
+        Title="VideoControler" Height="450" Width="800"
+        Closed="Window_Closed">
+    <Grid>
+        <StackPanel>
+            <Label Content="Server url"/>
+            <TextBox x:Name="ServerUrlTextBox"/>
+            <Label Content="Room"/>
+            <TextBox x:Name="RoomTextBox"/>
+            <Button x:Name="ConnectButton" Click="ConnectButton_Click" Content="Connect"/>
+            <Label Content="Video"/>
+            <TextBox x:Name="VideoPathTextBox" Text="D:\SystemFolders\Videos\Uni\Theo\1-1.mp4"/>
+            <Button x:Name="AddVideoButton" Click="AddVideoButton_Click" Content="Add Video"/>
+
+        </StackPanel>
+    </Grid>
+</Window>
