@@ -28,6 +28,7 @@ namespace MediaPlayerClient
             set
             {
                 mediaElements.ForEach(element => element.LoadedBehavior = value ? MediaState.Pause : MediaState.Play);
+                PlayButton.Content = !value ? "\uE769" : "\uE768";
             }
         }
         double TimeStamp
@@ -35,7 +36,11 @@ namespace MediaPlayerClient
             get => mediaElements.Count > 0 ? mediaElements[0].Position.TotalSeconds : 0;
             set
             {
-                mediaElements.ForEach(element => element.Position = TimeSpan.FromSeconds(value));
+                if (Math.Abs(TimeStamp - value) > 0.5)
+                {
+                    Debug.Print((Math.Abs(TimeStamp - value) > 0.5).ToString());
+                    mediaElements.ForEach(element => element.Position = TimeSpan.FromSeconds(value));
+                }
             }
         }
         double PlaySpeed
@@ -44,6 +49,7 @@ namespace MediaPlayerClient
             set
             {
                 mediaElements.ForEach(element => element.SpeedRatio = value);
+                HackySpeedSlider.Value = value;
             }
         }
         private TimeSpan totalTime;
@@ -122,7 +128,7 @@ namespace MediaPlayerClient
         private void SetPrimaryVideo(MediaElement element)
         {
             totalTime = element.NaturalDuration.TimeSpan;
-            TimeSlider.Maximum = element.NaturalDuration.TimeSpan.TotalSeconds;
+            HackyTimeSlider.Maximum = element.NaturalDuration.TimeSpan.TotalSeconds;
         }
 
         private void UpdateAllVideos(MediaResult result)
@@ -146,8 +152,15 @@ namespace MediaPlayerClient
             switch (e.Key)
             {
                 case Key.Space:
-                    IsPaused = !IsPaused;
-                    ServerConnection?.SendRequest(MediaCommand.Pause(IsPaused));
+                    TogglePause();
+                    break;
+                case Key.Left:
+                    TimeStamp -= 5;
+                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
+                    break;
+                case Key.Right:
+                    TimeStamp += 5;
+                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
                     break;
             }
         }
@@ -156,7 +169,6 @@ namespace MediaPlayerClient
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            // Check if the movie finished calculate it's total time
             if (mediaElements.Count > 0)
             {
                 MediaElement element = mediaElements[0];
@@ -164,8 +176,7 @@ namespace MediaPlayerClient
                 {
                     if (totalTime.TotalSeconds > 0)
                     {
-                        // Updating time slider
-                        TimeSlider.Value = element.Position.TotalSeconds;
+                        HackyTimeSlider.Value = element.Position.TotalSeconds;
                     }
                 }
             }
@@ -174,18 +185,46 @@ namespace MediaPlayerClient
 
         private void TimeSlider_MouseUp(object sender, MouseButtonEventArgs e)
         {
-          
             if (totalTime.TotalSeconds > 0)
             {
-                TimeStamp = TimeSlider.Value;
+                TimeStamp = HackyTimeSlider.Value;
                 ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
             }
         }
 
         private void VideoGrid_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            TogglePause();
+        }
+
+        private void TogglePause()
+        {
             IsPaused = !IsPaused;
             ServerConnection?.SendRequest(MediaCommand.Pause(IsPaused));
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            TogglePause();
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            TimeStamp -= 10;
+            ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
+        }
+
+        private void ForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            TimeStamp += 30;
+            ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
+        }
+
+       
+        private void HackySpeedSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            PlaySpeed = HackySpeedSlider.Value;
+            ServerConnection?.SendRequest(MediaCommand.SetPlaySpeed(PlaySpeed));
         }
     }
 }

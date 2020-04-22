@@ -43,6 +43,11 @@ namespace MediaPlayerClient
             return new MediaCommand(null, null, timeStamp, null, Action.change);
         }
 
+        public static MediaCommand SetPlaySpeed(double playSpeed)
+        {
+            return new MediaCommand(null, null, null, playSpeed, Action.change);
+        }
+
         public static MediaCommand GetUpdate()
         {
             return new MediaCommand(null, null, null, null, Action.getUpdate);

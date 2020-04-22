@@ -7,81 +7,7 @@
         mc:Ignorable="d"
         Title="PlayerWindow" Height="450" Width="800" Background="Black"
         KeyDown="Window_KeyDown">
-    <Window.Resources>
-        <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="IsTabStop" Value="false" />
-            <Setter Property="Focusable" Value="false" />
-            <Setter Property="Interval" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RepeatButton">
-                        <Border  BorderThickness="0" Background="Gray" Height="15"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <Style x:Key="SliderRepeatButton1" TargetType="RepeatButton">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="Interval" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RepeatButton">
-                        <Border SnapsToDevicePixels="True" Background="Blue"  BorderThickness="0"  Height="15"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SliderThumb" TargetType="Thumb">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Rectangle Height="15" Width="15" Fill="Blue"></Rectangle>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <ControlTemplate x:Key="Slider"  TargetType="Slider">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Track Grid.Row="1" x:Name="PART_Track"   >
-                    <Track.DecreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton1}"  Command="Slider.DecreaseLarge" />
-                    </Track.DecreaseRepeatButton>
-                    <Track.Thumb>
-                        <Thumb Style="{StaticResource SliderThumb}"  />
-                    </Track.Thumb>
-                    <Track.IncreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton}" Command="Slider.IncreaseLarge" />
-                    </Track.IncreaseRepeatButton>
-                </Track>
-            </Grid>
-        </ControlTemplate>
-
-        <Style x:Key="Horizontal_Slider" TargetType="Slider">
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Style.Triggers>
-                <Trigger Property="Orientation" Value="Horizontal">
-                    <Setter Property="MinHeight" Value="21" />
-                    <Setter Property="MinWidth" Value="104" />
-                    <Setter Property="Template" Value="{StaticResource Slider}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -89,8 +15,51 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" x:Name="VideoGrid" MouseDown="VideoGrid_MouseDown"/>
         <StackPanel Orientation="Vertical" Grid.Row="1">
-            <Slider x:Name="TimeSlider" Style="{StaticResource Horizontal_Slider}" IsMoveToPointEnabled="True"
-                    PreviewMouseUp="TimeSlider_MouseUp"/>
+            <!--Slider x:Name="TimeSlider" Style="{StaticResource Horizontal_Slider}" IsMoveToPointEnabled="True"
+                    PreviewMouseUp="TimeSlider_MouseUp"/-->
+            <local:HackySlider x:Name="HackyTimeSlider" HorizontalAlignment="Stretch" Height="15" PreviewMouseUp="TimeSlider_MouseUp"/>
+            <Grid HorizontalAlignment="Stretch" TextBlock.FontFamily="Segoe MDL2 Assets" TextBlock.FontSize="30">
+                <Grid.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="10,3,10,3"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                                        <Grid>
+                                            <Rectangle x:Name="background"
+                                   Fill="{TemplateBinding Background}"/>
+                                            <ContentPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="background" Property="Opacity" Value="0.3"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="False">
+                                            <Setter TargetName="background" Property="Opacity" Value="0"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Grid.Resources>
+                <local:HackySlider x:Name="HackySpeedSlider" Maximum="4" Value="1" PreviewMouseUp="HackySpeedSlider_PreviewMouseUp" Width="200" Height="15" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BackButton" Content="&#xED3C;" Click="BackButton_Click"/>
+                    <Button x:Name="PlayButton" Content="&#xE769;" Click="PlayButton_Click"/>
+                    <Button x:Name="ForwardButton" Content="&#xED3D;" Click="ForwardButton_Click"/>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Grid>
 </Window>
