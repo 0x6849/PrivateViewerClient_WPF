@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HackySlider.cs" />
     <Compile Include="MediaCommand.cs" />
     <Compile Include="MediaResult.cs" />
     <Compile Include="ServerConnection.cs" />

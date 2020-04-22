@@ -38,7 +38,7 @@ namespace MediaPlayerClient
             {
                 if (Math.Abs(TimeStamp - value) > 0.5)
                 {
-                    Debug.Print((Math.Abs(TimeStamp - value) > 0.5).ToString());
+                    Debug.Print(Math.Abs(TimeStamp - value).ToString());
                     mediaElements.ForEach(element => element.Position = TimeSpan.FromSeconds(value));
                 }
             }
@@ -118,6 +118,8 @@ namespace MediaPlayerClient
             if (mediaElements.Count > 1)
             {
                 element.Position = mediaElements[0].Position;
+                //temp fix
+                element.Volume = 0;
             }
             else
             {
