@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Xml;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace MediaPlayerClient
 {
@@ -41,12 +42,19 @@ namespace MediaPlayerClient
 
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            serverConnection = new ServerConnection(ServerUrlTextBox.Text, RoomTextBox.Text);
-            serverConnection.MessageReceivedEvent += ServerConnection_MessageReceivedEvent;
-            await serverConnection.Connect();
-            if (player != null)
+            try
             {
-                player.ServerConnection = serverConnection;
+                serverConnection = new ServerConnection(ServerUrlTextBox.Text, RoomTextBox.Text);
+                serverConnection.MessageReceivedEvent += ServerConnection_MessageReceivedEvent;
+                await serverConnection.Connect();
+                if (player != null)
+                {
+                    player.ServerConnection = serverConnection;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -109,6 +117,16 @@ namespace MediaPlayerClient
 
                 writer.WriteEndDocument();
 
+            }
+        }
+
+        private void BrowseFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                VideoPathTextBox.Text = openFileDialog.FileName;
             }
         }
     }

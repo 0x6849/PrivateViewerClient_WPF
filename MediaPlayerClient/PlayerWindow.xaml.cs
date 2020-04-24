@@ -68,6 +68,8 @@ namespace MediaPlayerClient
         }
         private ServerConnection serverConnection;
 
+        private TimeSpan totalLengh = TimeSpan.FromSeconds(0);
+
         public PlayerWindow(string videoPath)
         {
             InitializeComponent();
@@ -126,6 +128,7 @@ namespace MediaPlayerClient
         {
             totalTime = element.NaturalDuration.TimeSpan;
             HackyTimeSlider.Maximum = element.NaturalDuration.TimeSpan.TotalSeconds;
+            totalLengh = element.NaturalDuration.TimeSpan;
         }
 
         private void UpdateAllVideos(MediaResult result)
@@ -144,23 +147,6 @@ namespace MediaPlayerClient
             }
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Space:
-                    TogglePause();
-                    break;
-                case Key.Left:
-                    TimeStamp -= 5;
-                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
-                    break;
-                case Key.Right:
-                    TimeStamp += 5;
-                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
-                    break;
-            }
-        }
 
         
 
@@ -174,6 +160,7 @@ namespace MediaPlayerClient
                     if (totalTime.TotalSeconds > 0)
                     {
                         HackyTimeSlider.Value = element.Position.TotalSeconds;
+                        StatusLabel.Content = element.Position.ToString(@"hh\:mm\:ss") + " / " + totalLengh.ToString(@"hh\:mm\:ss")  + " " + (element.Position.TotalSeconds / totalLengh.TotalSeconds * 100).ToString("N2") + "%";
                     }
                 }
             }
@@ -229,6 +216,28 @@ namespace MediaPlayerClient
             if (mediaElements.Count > 0)
             {
                 mediaElements[0].Volume = HackyVolumeSlider.Value;
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.MediaPlayPause:
+                case Key.Space:
+                    TogglePause();
+                    e.Handled = true;
+                    break;
+                case Key.Left:
+                    TimeStamp -= 5;
+                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
+                    e.Handled = true;
+                    break;
+                case Key.Right:
+                    TimeStamp += 5;
+                    ServerConnection?.SendRequest(MediaCommand.SetTimeStamp(TimeStamp));
+                    e.Handled = true;
+                    break;
             }
         }
     }

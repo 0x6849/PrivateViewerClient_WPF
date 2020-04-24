@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MediaPlayerClient"
         mc:Ignorable="d"
-        Title="PlayerWindow" Height="450" Width="800" Background="Black"
-        KeyDown="Window_KeyDown">
+        Title="PlayerWindow" Height="450" Width="1200" Background="Black"
+        PreviewKeyDown="Window_PreviewKeyDown">
 
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
@@ -15,8 +15,6 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" x:Name="VideoGrid" MouseDown="VideoGrid_MouseDown"/>
         <StackPanel Orientation="Vertical" Grid.Row="1">
-            <!--Slider x:Name="TimeSlider" Style="{StaticResource Horizontal_Slider}" IsMoveToPointEnabled="True"
-                    PreviewMouseUp="TimeSlider_MouseUp"/-->
             <local:HackySlider x:Name="HackyTimeSlider" HorizontalAlignment="Stretch" Height="15" PreviewMouseUp="TimeSlider_MouseUp"/>
             <Grid HorizontalAlignment="Stretch" TextBlock.FontFamily="Segoe MDL2 Assets" TextBlock.FontSize="30">
                 <Grid.Resources>
@@ -63,6 +61,7 @@
                     <Button x:Name="ForwardButton" Content="&#xED3D;" Click="ForwardButton_Click"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Label x:Name="StatusLabel" Content="-" Foreground="White" FontFamily="Segoe UI" FontSize="14"/>
                     <local:HackySlider x:Name="HackyVolumeSlider" Maximum="1" Value="0.5" PreviewMouseUp="HackyVolumeSlider_PreviewMouseUp" Width="150" Height="15"/>
                 </StackPanel>
             </Grid>
